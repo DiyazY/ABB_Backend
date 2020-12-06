@@ -1,12 +1,16 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Azure.Storage.Blobs;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Backend.Services
 {
-    public class TranslationService: ITranslationService
+    public class TranslationService : ITranslationService
     {
         private readonly IMemoryCache _cache;
 
@@ -24,7 +28,7 @@ namespace Backend.Services
         /// <returns></returns>
         public string GetTranslation(string lang, string key)
         {
-            if (_cache.TryGetValue($"{lang}/{key}", out string value) && !string.IsNullOrWhiteSpace(value))
+            if (_cache.TryGetValue($"{lang.ToUpper()}/{key.ToUpper()}", out string value) && !string.IsNullOrWhiteSpace(value))
             {
                 return value;
             }
@@ -34,11 +38,41 @@ namespace Backend.Services
             }
         }
 
-        public Task ReadDictionariesIntoMemory()
+        public async Task ReadDictionariesIntoMemoryAsync(CancellationToken token)
         {
-            _cache.Set("fi/Common_OKButtonText", "FI_OK");
-            _cache.Set("fi/Common_CancelButtonText", "FI_Cancel");
-            return Task.CompletedTask;
+            var blobStorageConnectionString = Environment.GetEnvironmentVariable("bs_con_str", EnvironmentVariableTarget.Process);
+            BlobServiceClient blobServiceClient = new BlobServiceClient(blobStorageConnectionString);
+            var containerClient = blobServiceClient.GetBlobContainerClient("translations");
+            await foreach (var blobItem in containerClient.GetBlobsAsync().WithCancellation(token))
+            {
+                var blockBlob = containerClient.GetBlobClient(blobItem.Name);
+                if (await blockBlob.ExistsAsync(token))
+                {
+                    using var stream = new MemoryStream();
+                    await blockBlob.DownloadToAsync(stream, token);
+                    string jsonText = Encoding.Default.GetString(stream.ToArray());
+                    var options = new JsonSerializerOptions
+                    {
+                        ReadCommentHandling = JsonCommentHandling.Skip,
+                        AllowTrailingCommas = true,
+                    };
+                    var jsonElement = JsonSerializer.Deserialize<JsonElement>(jsonText, options);
+
+                    if (jsonElement.TryGetProperty("Language", out var lang))
+                    {
+                        var langCode = lang.GetString().ToUpper();
+                        if (!string.IsNullOrWhiteSpace(langCode))
+                        {
+                            Console.WriteLine($"Lang: {langCode}");
+                            foreach (var item in jsonElement.EnumerateObject())
+                            {
+                                if (item.Name == "Language") continue;
+                                _cache.Set($"{langCode}/{item.Name.ToUpper()}", item.Value.GetString());
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

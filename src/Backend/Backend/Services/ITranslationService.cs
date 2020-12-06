@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Backend.Services
@@ -10,6 +11,6 @@ namespace Backend.Services
     {
         string GetTranslation(string lang, string key);
 
-        Task ReadDictionariesIntoMemory();
+        Task ReadDictionariesIntoMemoryAsync(CancellationToken token);
     }
 }
