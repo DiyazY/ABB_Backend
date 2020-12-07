@@ -15,7 +15,7 @@ Here is the [link](https://orange-rock-0985d540f.azurestaticapps.net) for applic
 Note: Backend uses Azure Key Vault in order to store Azure Blob Storage Connection String
 
 ## C4Container View
-Simple representation of the system
+Simple representation of the system. It consists of 3 C4Containers: React Application, Backend Application, Blob Storage
 ![](out/docs/C4Containers_VIew/C4Container%20View.png)
 
 ## Workflow sequencing diagram
