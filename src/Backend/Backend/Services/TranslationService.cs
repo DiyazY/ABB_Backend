@@ -12,6 +12,7 @@ namespace Backend.Services
 {
     public class TranslationService : ITranslationService
     {
+        /// Better to use some Azure Redis Cache
         private readonly IMemoryCache _cache;
 
         public TranslationService(IMemoryCache cache)
@@ -38,6 +39,13 @@ namespace Backend.Services
             }
         }
 
+        /// <summary>
+        /// Reads translations into a memory
+        /// Note: now it's just a simple MemoryCahce. 
+        /// However, the solution might be enhanced by using Azure Redis Cache, it would provide scalability and reliability. 
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task ReadDictionariesIntoMemoryAsync(CancellationToken token)
         {
             var blobStorageConnectionString = Environment.GetEnvironmentVariable("bs_con_str", EnvironmentVariableTarget.Process);

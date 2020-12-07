@@ -33,6 +33,8 @@ namespace Backend
             }
             catch (Exception ex)
             {
+                // here we may rise an event in order to trigger read dictionaries background task
+                // then try to reread and only after ensuring that there is no such a translation throw an error
                 log.LogError($"The translation is not found! Key: {key}, Language: {lang}");
                 return new NotFoundObjectResult(ex.Message);
             }

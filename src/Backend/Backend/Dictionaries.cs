@@ -17,7 +17,7 @@ namespace Backend
         }
 
         [FunctionName("Dictionaries")]
-        public async Task Run([TimerTrigger("0 */5 * * * *", RunOnStartup = true)]TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("0 */30 * * * *", RunOnStartup = true)]TimerInfo myTimer, ILogger log)
         {
             log.LogInformation("Load dictionaries into memory");
             var tokenSource = new CancellationTokenSource();
