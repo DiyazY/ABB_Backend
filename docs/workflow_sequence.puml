@@ -1,0 +1,25 @@
+@startuml Customer is registering
+
+title ABB Test Assessment Workflow
+
+participant "React Application"
+participant "Backend Application"
+database "Blob Storage"
+
+group Served by Translations Azure Function(http-triggered function)
+"React Application"->"Backend Application": requests translation by lang code and key  
+note over "Backend Application": gets translation from the cache
+"React Application"<-"Backend Application": responds with translation
+
+end 
+
+group Served by Dictionaries Azure Function(time-triggered function)
+note over "Backend Application": triggered by timer
+"Backend Application"->"Blob Storage": fetches list of blobs from 'translations' container 
+"Backend Application"->"Blob Storage": fetches each translation file
+
+note over "Backend Application": deserialise translations and sets them into memory
+
+end 
+
+@enduml

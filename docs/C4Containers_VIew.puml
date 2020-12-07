@@ -1,0 +1,17 @@
+@startuml C4Container View
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "User")
+
+System_Boundary(c1, 'ABB test assessment') {
+    Container(ReactApp, "React Application", "ReactJs/TS/Azure Web Static", "Web application")
+    Container(Backend, "Backend application", "Azure Functions/C#", "Contains two functions. Translations: Http-triggered function, Dictionaries: Time-triggered function")
+    ContainerDb(Storage, "Blob Storage", "Azure Blob Storage", "Keeps blob files. Translations are stored in 'translation' container")
+}
+
+
+Rel(user, ReactApp, "uses application", "via browser")
+Rel(ReactApp, Backend, "gets translations from", "HTTPS")
+Rel(Backend, Storage, "fetches translation files from", "HTTPS")
+
+@enduml
