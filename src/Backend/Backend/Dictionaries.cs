@@ -17,8 +17,9 @@ namespace Backend
         }
 
         [FunctionName("Dictionaries")]
-        public async Task Run([TimerTrigger("0 */6 * * *")]TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("0 */5 * * * *", RunOnStartup = true)]TimerInfo myTimer, ILogger log)
         {
+            log.LogInformation("Load dictionaries into memory");
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
             try
