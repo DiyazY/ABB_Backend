@@ -19,5 +19,5 @@ Simple representation of the system. It consists of 3 C4Containers: React Applic
 ![](out/docs/C4Containers_VIew/C4Container%20View.png)
 
 ## Workflow sequencing diagram
-It gives a brief explanation of how works the main workflow process of the system
+It gives a brief explanation of how the main workflow process of the system works
 ![](out/docs/workflow_sequence/Customer%20is%20registering.png)
